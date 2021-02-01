@@ -1,0 +1,10 @@
+---
+title: "20_EDA"
+output: html_notebook
+---
+
+```{r}
+hist(df$distance)
+hist(log(df$distance))
+
+```
