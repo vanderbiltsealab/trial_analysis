@@ -1,0 +1,24 @@
+---
+title: "40_analysis"
+output: html_notebook
+---
+
+```{r}
+merged <- merge(s_v, v_s, by = 'time_stamp')
+```
+
+```{r}
+merged %>% filter(motion_category.x == 'Motion' & motion_category.y == 'Stationary')
+```
+
+```{r}
+t <- ggplot(merged, aes(x=time.y, y=distance_m.x)) +
+  geom_line(alpha = .7) + 
+  xlab("") +
+  geom_hline(yintercept = 3, color = 'red') +
+  theme_light() +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.border = element_blank(), 
+        axis.line = element_line(colour = "black"))
+t
+```
+
