@@ -8,9 +8,7 @@ hist(df$distance)
 hist(log(df$distance))
 
 ```
-```{r}
-hms(as.character(df$time_stamp))
-```
+
 
 ```{r}
 df$hour <- df$time
@@ -19,60 +17,27 @@ df$hour <- format(strptime(df$hour,"%Y-%m-%d %H:%M:%S"),'%H:%M')
 
 ```{r}
 df1 <- df %>% filter(name != 'Sid') %>% filter(other_device == 'c0:98:e5:42:01:03')
-library(plotly)
-
-p <- df1 %>%
-  plot_ly(
-    x = ~hour, 
-    y = ~distance_m, 
-    size = .9, 
-    color = ~name, 
-    frame = ~hour, 
-    text = ~name, 
-    hoverinfo = "text",
-    type = 'scatter',
-    mode = 'markers'
-  ) %>%
-  layout(
-    xaxis = list(
-      type = "log"
-    )
-  )
-
-p %>% layout(
-    yaxis = list(range = c(0, 20)))
+df1 <- df1 %>% group_by(hour) %>% filter(distance == min(distance))
 ```
 
 
 
 ```{r}
-
-library(ggplot2)
-#use devtools::install_github('thomasp85/gganimate') to install as it is not on CRAN
-library(gganimate)
-
-# ggplot from the github README
 pp <- ggplot(df1, aes(time, distance, size = .9, colour = name)) +
   geom_point(alpha = 0.7, show.legend = FALSE) 
-  #scale_colour_manual(values = country_colors) +
-  #scale_size(range = c(2, 12)) +
-  #scale_x_log10() +
-  #facet_wrap(~continent) +
-  # Here comes the gganimate specific bits
-  #labs(title = 'Year: {frame_time}', x = 'GDP per capita', y = 'life expectancy') +
-  #transition_time(time) +
-  #ease_aes('linear')
+
 
 plot(pp)
 ```
 
 
 ```{r}
-df1 <- df1 %>% group_by(hour) %>% filter(distance == mean(distance))
 
 pq <- pp +
   facet_wrap(~name) +
-  transition_reveal(time)
+  transition_reveal(time)+
+  theme(panel.grid.minor = element_blank(), panel.grid.major = element_blank()) +
+  theme_light()
 
 
 
