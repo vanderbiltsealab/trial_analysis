@@ -1,0 +1,83 @@
+---
+title: "42_zeke_analysis"
+output: html_notebook
+---
+
+-------------------
+
+Zeke with Sid
+
+--------------------
+
+```{r}
+merged3 <- merge(s_z, z_s, by = 'time_stamp')
+```
+
+```{r}
+z_motion <- merged3 %>% filter(motion_category.x == 'Stationary' & motion_category.y == 'Motion')
+```
+
+```{r}
+t <- ggplot(z_motion, aes(x=time.y, y=distance_m.x)) +
+  geom_line(alpha = .7) + 
+  xlab("") +
+  geom_hline(yintercept = 1, color = 'red') +
+  theme_light() +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.border = element_blank(), 
+        axis.line = element_line(colour = "black"))
+t
+```
+
+
+```{r}
+for(i in 1:nrow(z_motion)) {
+  if (z_motion$distance_m.x[i] >= 1) {
+    z_motion[i,'yn'] <- 1
+  }
+  else{
+    z_motion[i,'yn'] <- 0 
+  }
+}
+```
+
+```{r}
+z_motion$sum <- rollapply(z_motion$yn,3,sum, partial = TRUE, align = "right")
+```
+
+```{r}
+
+for(i in 1:nrow(z_motion)) {
+  if ((z_motion$sum[i] == 2) && (z_motion$sum[i-1] == 3)) {
+    z_motion[i,'loop'] <- 1
+  }
+  else{
+    z_motion[i,'loop'] <- 0 
+  }
+}
+
+for(i in 1:nrow(z_motion)) {
+  if ((z_motion$loop[i] == 1) && (z_motion$yn[i+2] == 1)) {
+    z_motion[i,'loop'] <- 0
+  }
+}
+```
+
+```{r}
+sum(z_motion$loop)
+```
+
+
+
+```{r}
+merged3$touching <- ifelse(merged3$distance_m.y <= 1, 1, 0)
+```
+
+
+```{r}
+ggplot(merged3, aes(touching, y = ..prop..)) +
+  geom_bar(width = .5) +
+  theme_light() +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
+  scale_y_continuous(labels = scales::percent_format())
+```
+

@@ -1,0 +1,84 @@
+---
+title: "41_virginia_analysis"
+output: html_notebook
+---
+
+-------------------
+
+Virginia with Sid
+
+--------------------
+
+```{r}
+merged2 <- merge(s_v, v_s, by = 'time_stamp')
+```
+
+```{r}
+v_motion <- merged2 %>% filter(motion_category.x == 'Stationary' & motion_category.y == 'Motion')
+```
+
+```{r}
+t <- ggplot(v_motion, aes(x=time.y, y=distance_m.x)) +
+  geom_line(alpha = .7) + 
+  xlab("") +
+  geom_hline(yintercept = 1, color = 'red') +
+  theme_light() +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.border = element_blank(), 
+        axis.line = element_line(colour = "black"))
+t
+```
+
+```{r}
+for(i in 1:nrow(v_motion)) {
+  if (v_motion$distance_m.x[i] >= 1) {
+    v_motion[i,'yn'] <- 1
+  }
+  else{
+    v_motion[i,'yn'] <- 0 
+  }
+}
+```
+
+```{r}
+v_motion$sum <- rollapply(v_motion$yn,3,sum, partial = TRUE, align = "right")
+```
+
+```{r}
+
+for(i in 1:nrow(v_motion)) {
+  if ((v_motion$sum[i] == 2) && (v_motion$sum[i-1] == 3)) {
+    v_motion[i,'loop'] <- 1
+  }
+  else{
+    v_motion[i,'loop'] <- 0 
+  }
+}
+
+for(i in 1:nrow(v_motion)) {
+  if ((v_motion$loop[i] == 1) && (v_motion$yn[i+2] == 1)) {
+    v_motion[i,'loop'] <- 0
+  }
+}
+```
+
+```{r}
+sum(v_motion$loop)
+```
+
+
+```{r}
+merged2$touching <- ifelse(merged2$distance_m.y <= 1, 1, 0)
+```
+
+
+```{r}
+ggplot(merged2, aes(touching, y = ..prop..)) +
+  geom_bar(width = .5) +
+  theme_light() +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
+  scale_y_continuous(labels = scales::percent_format())
+```
+
+
+
+

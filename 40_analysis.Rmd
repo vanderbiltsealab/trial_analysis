@@ -1,24 +1,131 @@
 ---
-title: "40_analysis"
+title: "40_sid_analysis"
 output: html_notebook
 ---
+-------------------
+
+Sid with Virginia
+
+--------------------
 
 ```{r}
 merged <- merge(s_v, v_s, by = 'time_stamp')
 ```
 
 ```{r}
-merged %>% filter(motion_category.x == 'Motion' & motion_category.y == 'Stationary')
+sid_motion <- merged %>% filter(motion_category.x == 'Motion' & motion_category.y == 'Stationary')
 ```
 
 ```{r}
-t <- ggplot(merged, aes(x=time.y, y=distance_m.x)) +
+t <- ggplot(sid_motion, aes(x=time.y, y=distance_m.x)) +
   geom_line(alpha = .7) + 
   xlab("") +
-  geom_hline(yintercept = 3, color = 'red') +
+  geom_hline(yintercept = 1, color = 'red') +
   theme_light() +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.border = element_blank(), 
         axis.line = element_line(colour = "black"))
 t
+```
+
+```{r}
+for(i in 1:nrow(sid_motion)) {
+  if (sid_motion$distance_m.x[i] >= 1) {
+    sid_motion[i,'yn'] <- 1
+  }
+  else{
+    sid_motion[i,'yn'] <- 0 
+  }
+}
+```
+
+```{r}
+sid_motion$sum <- rollapply(sid_motion$yn,3,sum, partial = TRUE, align = "right")
+```
+
+```{r}
+
+for(i in 1:nrow(sid_motion)) {
+  if ((sid_motion$sum[i] == 2) && (sid_motion$sum[i-1] == 3)) {
+    sid_motion[i,'loop'] <- 1
+  }
+  else{
+   sid_motion[i,'loop'] <- 0 
+  }
+}
+
+for(i in 1:nrow(sid_motion)) {
+  if ((sid_motion$loop[i] == 1) && (sid_motion$yn[i+2] == 1)) {
+    sid_motion[i,'loop'] <- 0
+  }
+}
+
+```
+
+```{r}
+sum(sid_motion$loop)
+```
+
+--------------------
+
+Sid with Zeke
+
+--------------------
+
+```{r}
+merged1 <- merge(s_z, z_s, by = 'time_stamp')
+```
+
+```{r}
+sid1_motion <- merged1 %>% filter(motion_category.x == 'Motion' & motion_category.y == 'Stationary')
+```
+
+```{r}
+t <- ggplot(sid1_motion, aes(x=time.y, y=distance_m.x)) +
+  geom_line(alpha = .7) + 
+  xlab("") +
+  geom_hline(yintercept = 1, color = 'red') +
+  theme_light() +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.border = element_blank(), 
+        axis.line = element_line(colour = "black"))
+t
+```
+
+
+```{r}
+for(i in 1:nrow(sid1_motion)) {
+  if (sid1_motion$distance_m.x[i] >= 1) {
+    sid1_motion[i,'yn'] <- 1
+  }
+  else{
+   sid1_motion[i,'yn'] <- 0 
+  }
+}
+
+```
+
+```{r}
+sid1_motion$sum <- rollapply(sid1_motion$yn,3,sum, partial = TRUE, align = "right")
+```
+
+```{r}
+
+for(i in 1:nrow(sid1_motion)) {
+  if ((sid1_motion$sum[i] == 2) && (sid1_motion$sum[i-1] == 3)) {
+    sid1_motion[i,'loop'] <- 1
+  }
+  else{
+   sid1_motion[i,'loop'] <- 0 
+  }
+}
+
+for(i in 1:nrow(sid1_motion)) {
+  if ((sid1_motion$loop[i] == 1) && (sid1_motion$yn[i+2] == 1)) {
+    sid1_motion[i,'loop'] <- 0
+  }
+}
+```
+
+```{r}
+sum(sid1_motion$loop)
 ```
 
