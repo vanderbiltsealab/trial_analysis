@@ -10,7 +10,8 @@ Zeke with Sid
 --------------------
 
 ```{r}
-merged3 <- merge(s_z, z_s, by = 'time_stamp')
+merged3 <- merge(s_z, z_s, by = 'time_stamp') 
+merged3 <- merged3 %>% filter(distance.x == distance.y)
 ```
 
 ```{r}
@@ -56,7 +57,7 @@ for(i in 1:nrow(z_motion)) {
 }
 
 for(i in 1:nrow(z_motion)) {
-  if ((z_motion$loop[i] == 1) && (z_motion$yn[i+2] == 1)) {
+  if ((z_motion$loop[i] == 1) && (z_motion$yn[i+1] == 1)) {
     z_motion[i,'loop'] <- 0
   }
 }

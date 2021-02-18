@@ -10,6 +10,7 @@ Sid with Virginia
 
 ```{r}
 merged <- merge(s_v, v_s, by = 'time_stamp')
+merged <- merged %>% filter(distance.x == distance.y)
 ```
 
 ```{r}
@@ -54,7 +55,7 @@ for(i in 1:nrow(sid_motion)) {
 }
 
 for(i in 1:nrow(sid_motion)) {
-  if ((sid_motion$loop[i] == 1) && (sid_motion$yn[i+2] == 1)) {
+  if ((sid_motion$loop[i] == 1) && (sid_motion$yn[i+1] == 1)) {
     sid_motion[i,'loop'] <- 0
   }
 }
@@ -73,6 +74,7 @@ Sid with Zeke
 
 ```{r}
 merged1 <- merge(s_z, z_s, by = 'time_stamp')
+merged1 <- merged1 %>% filter(distance.x == distance.y)
 ```
 
 ```{r}
@@ -119,7 +121,7 @@ for(i in 1:nrow(sid1_motion)) {
 }
 
 for(i in 1:nrow(sid1_motion)) {
-  if ((sid1_motion$loop[i] == 1) && (sid1_motion$yn[i+2] == 1)) {
+  if ((sid1_motion$loop[i] == 1) && (sid1_motion$yn[i+1] == 1)) {
     sid1_motion[i,'loop'] <- 0
   }
 }

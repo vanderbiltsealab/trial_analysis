@@ -11,6 +11,7 @@ Virginia with Sid
 
 ```{r}
 merged2 <- merge(s_v, v_s, by = 'time_stamp')
+merged2 <- merged2 %>% filter(distance.x == distance.y)
 ```
 
 ```{r}
@@ -55,7 +56,7 @@ for(i in 1:nrow(v_motion)) {
 }
 
 for(i in 1:nrow(v_motion)) {
-  if ((v_motion$loop[i] == 1) && (v_motion$yn[i+2] == 1)) {
+  if ((v_motion$loop[i] == 1) && (v_motion$yn[i+1] == 1)) {
     v_motion[i,'loop'] <- 0
   }
 }
