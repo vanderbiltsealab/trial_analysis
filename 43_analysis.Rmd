@@ -1,0 +1,137 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+m <- inner_join(s_z, z_s, by = 'time_stamp')
+m <- m %>% filter(distance.x == distance.y)
+m <- m %>% select(time_stamp, name.x, name.y, motion_category.x, motion_category.y, other_device.x, other_device.y, distance_m.x, time.x)
+m <-m %>% rename(time = time.x, distance = distance_m.x )
+m <- reshape(m, idvar = "time_stamp", timevar = "name.y", direction = "wide")
+```
+
+
+
+```{r}
+n <- inner_join(s_v, v_s, by = 'time_stamp')
+n <- n %>% filter(distance.x == distance.y)
+n <- n %>% select(time_stamp, name.x, name.y, motion_category.x, motion_category.y, other_device.x, other_device.y, distance_m.x, time.x)
+n <- n %>% rename(time = time.x, distance = distance_m.x )
+n <- reshape(n, idvar = "time_stamp", timevar = "name.y", direction = "wide")
+```
+
+```{r}
+mn <-inner_join(m,n, by = 'time_stamp') %>% 
+  select(-c('time_stamp', starts_with('other_device'), 'time.Virginia', 'name.x.Virginia', 'motion_category.x.Virginia'))
+mn <- mn %>% rename(time = time.Zeke, motion_category_s = motion_category.x.Zeke, motion_category_z = motion_category.y.Zeke,
+                    motion_category_v = motion_category.y.Virginia, name = name.x.Zeke)
+```
+
+```{r}
+for(i in 1:nrow(mn)) {
+  if (mn$distance.Zeke[i] < 1 | mn$distance.Virginia[i] < 1) {
+    mn[i,'yn'] <- 0
+  }
+  else{
+    mn[i,'yn'] <- 1 
+  }
+}
+
+```
+
+
+```{r}
+mn$sum <- rollapply(mn$yn,3,sum, partial = TRUE, align = "right")
+```
+
+
+```{r}
+
+for(i in 1:nrow(mn)) {
+  if ((mn$sum[i] == 2) && (mn$sum[i-1] == 3)) {
+    mn[i,'loop'] <- 1
+  }
+  else{
+    mn[i,'loop'] <- 0 
+  }
+}
+
+
+for(i in 1:nrow(mn)) {
+  if ((mn$loop[i] == 1) && (mn$yn[i+1] == 1)) {
+    mn[i,'loop'] <- 0
+  }
+}
+```
+
+```{r}
+sum(mn$loop)
+```
+
+
+
+
+
+
+
+
+
+```{r}
+df$other_name <- ifelse(df$other_device == 'c0:98:e5:42:01:06', 'Zeke',ifelse(df$other_device == 'c0:98:e5:42:01:03', 'Sid','Virginia'))
+```
+
+```{r}
+df$status <- ifelse(df$name == 'Virginia' | df$name == 'Zeke', 'parent', 'child')
+```
+
+```{r}
+for(i in 1:nrow(df)) {
+  if (df$distance_m[i] >= 1) {
+    df[i,'yn'] <- 1
+  }
+  else{
+    df[i,'yn'] <- 0 
+  }
+}
+```
+
+
+```{r}
+df_all <- df %>% group_by(name, other_name) %>%
+       mutate(sum=rollapplyr(yn, 3, sum, partial=TRUE))
+```
+
+```{r}
+for(i in 1:nrow(df_all)) {
+  if ((df_all$sum[i] == 2) && (df_all$sum[i-2] == 3)) {
+    df_all[i,'loop'] <- 1
+  }
+  else{
+    df_all[i,'loop'] <- 0 
+  }
+}
+
+for(i in 1:nrow(df_all)) {
+  if ((df_all$loop[i] == 1) && (df_all$yn[i+2] == 1)) {
+    df_all[i,'loop'] <- 0
+  }
+}
+```
+
+```{r}
+sum(df_all$loop)
+```
+
+
+```{r}
+library(dplyr)
+wide <- reshape(df, idvar = "time_stamp", timevar = "name", direction = "wide") 
+wide %>% select(starts_with("other"), starts_with("distance_m"))
+
+```
+
+```{r}
+df%>% reshape(idvar = "time_stamp", timevar = "name", direction = "wide") 
+```
+
