@@ -23,11 +23,16 @@ df1 <- df %>% filter(name != 'Sid') %>% filter(other_device == 'c0:98:e5:42:01:0
 
 
 ```{r}
+#with legend for same graph
 pp <- ggplot(df1, aes(time, distance_m, size = .9, colour = name)) +
-  geom_point(alpha = 0.7, show.legend = FALSE) +
+  geom_point(alpha = 0.7, show.legend = TRUE) +
   geom_hline(yintercept = 1, color = 'red') +
+  theme_light() +
+  theme(legend.title = element_blank(), panel.grid.minor = element_blank(), panel.grid.major = element_blank()) +
   xlab('Time') +
-  ylab('Distance (Meters)')
+  ylab('Distance (Meters)') +
+  guides(size = FALSE) 
+  
 
 
 plot(pp)
@@ -35,12 +40,41 @@ plot(pp)
 
 
 ```{r}
-
-pq <- pp +
-  facet_wrap(~name) +
+#Both points overlayed into the same plot
+pq1 <- pp +
   transition_reveal(time)+
   theme(panel.grid.minor = element_blank(), panel.grid.major = element_blank()) +
   theme_light()
+
+
+
+animate(pq1, duration = 25)
+```
+
+
+
+```{r}
+#without legend for facet graph
+pp <- ggplot(df1, aes(time, distance_m, size = .9, colour = name)) +
+  geom_point(alpha = 0.7, show.legend = FALSE) +
+  geom_hline(yintercept = 1, color = 'red') +
+  theme_light() +
+  theme(legend.title = element_blank(), panel.grid.minor = element_blank(), panel.grid.major = element_blank()) +
+  xlab('Time') +
+  ylab('Distance (Meters)') +
+  guides(size = FALSE) 
+  
+
+
+plot(pp)
+```
+
+
+```{r}
+#Points in separate graphs
+pq <- pp +
+  facet_wrap(~name) +
+  transition_reveal(time) 
 
 
 
@@ -48,9 +82,15 @@ animate(pq, duration = 25)
 ```
 
 
+
+
 ```{r}
 ##to save file -- 
-#a <- animate(pq, renderer = av_renderer("dist_animate.mp4"), duration = 25, width = 800, height = 450)
-#anim_save("dist_animate1.mp4", a)
+#b <- animate(pq1, renderer = ffmpeg_renderer())
+
+#anim_save("animation.mp4", b)
+
+#a <- animate(pq, renderer = av_renderer("animation.mp4"), duration = 25, width = 800, height = 450)
+#anim_save("animation1.mp4", a)
 ```
 
