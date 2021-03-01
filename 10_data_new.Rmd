@@ -1,0 +1,145 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+```{r}
+#Add libraries
+library(tidyverse)
+library(ggplot2)
+library(dplyr)
+library(readxl)
+library(data.table)
+library(gganimate)
+library(zoo)
+library(janitor)
+```
+
+
+File #1 (03)
+```{r}
+#load in log file
+file_03 <- read.delim("data/03_SS_20210109.LOG", header = FALSE, sep = "\t", dec = ".", quote = "", comment = '#')
+```
+
+```{r}
+#name columns
+colnames(file_03)[1]<-"timestamp"
+colnames(file_03)[2]<-"other_device"
+colnames(file_03)[3]<-"distance"
+```
+
+```{r}
+#load in motion data
+motion_03 <- read_csv("data/03_motions.csv") %>% clean_names()
+```
+
+```{r}
+#merge motion with data
+df_03 <- merge(file_03,motion_03,by="timestamp", all=T)
+```
+
+```{r}
+df_03 <- df_03 %>% fill(motion)  %>% fill(device, .direction = 'updown')
+df_03 <- df_03[!is.na(df_03$distance), ]
+df_03 <- df_03 %>% 
+  filter(!timestamp %like% "###") %>% 
+  filter(distance != 999999)
+```
+
+
+File #2 (06)
+```{r}
+#load in log file
+file_06 <- read.delim("data/06_ZS_20210109.LOG", header = FALSE, sep = "\t", dec = ".", quote = "", comment = '#')
+```
+
+```{r}
+#name columns
+colnames(file_06)[1]<-"timestamp"
+colnames(file_06)[2]<-"other_device"
+colnames(file_06)[3]<-"distance"
+```
+
+```{r}
+#load in motion data
+motion_06 <- read_csv("data/06_motions.csv") %>% clean_names()
+```
+
+```{r}
+#merge motion with data
+df_06 <- merge(file_06,motion_06,by="timestamp", all=T)
+```
+
+```{r}
+df_06 <- df_06 %>% fill(motion) %>% fill(device, .direction = 'updown')
+df_06 <- df_06[!is.na(df_06$distance), ]
+df_06 <- df_06 %>% 
+  filter(!timestamp %like% "###") %>% 
+  filter(distance != 999999)
+```
+
+
+
+File #3 (07)
+```{r}
+#load in log file
+file_07 <- read.delim("data/07_VS_20210109.LOG", header = FALSE, sep = "\t", dec = ".", quote = "", comment = '#')
+```
+
+```{r}
+#name columns
+colnames(file_07)[1]<-"timestamp"
+colnames(file_07)[2]<-"other_device"
+colnames(file_07)[3]<-"distance"
+```
+
+```{r}
+#load in motion data
+motion_07 <- read_csv("data/07_motions.csv") %>% clean_names()
+```
+
+```{r}
+#merge motion with data
+df_07 <- merge(file_07,motion_07,by="timestamp", all=T)
+```
+
+```{r}
+df_07 <- df_07 %>% fill(motion) %>% fill(device, .direction = 'updown')
+df_07 <- df_07[!is.na(df_07$distance), ]
+df_07 <- df_07 %>% 
+  filter(!timestamp %like% "###") %>% 
+  filter(distance != 999999)
+```
+
+
+
+All together in one dataframe 
+```{r}
+df <- rbind(df_03, df_06, df_07)
+#create distance in meters
+df$distance_m <-df$distance*.001
+```
+
+```{r}
+#make a date and time column
+df$time <- as.POSIXct(as.numeric(as.character(df$timestamp)), origin="1970-01-01", 'GMT')
+df$date <- as.Date(df$time)
+
+df$time <- format(df$time,"%H:%M:%S")
+```
+
+
+Individual Interactions:
+
+```{r}
+z_s <- df %>% filter(device == 'c0:98:e5:42:01:06') %>% filter(other_device == 'c0:98:e5:42:01:03')
+```
+
+```{r}
+v_s <- df %>% filter(device == 'c0:98:e5:42:01:07') %>% filter(other_device == 'c0:98:e5:42:01:03')
+```
+
+```{r}
+s_z <- df %>% filter(device == 'c0:98:e5:42:01:03') %>% filter(other_device == 'c0:98:e5:42:01:06')
+s_v <- df %>% filter(device == 'c0:98:e5:42:01:03') %>% filter(other_device == 'c0:98:e5:42:01:07')
+```
