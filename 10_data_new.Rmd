@@ -122,10 +122,10 @@ df$distance_m <-df$distance*.001
 
 ```{r}
 #make a date and time column
-df$time <- as.POSIXct(as.numeric(as.character(df$timestamp)), origin="1970-01-01", 'GMT')
-df$date <- as.Date(df$time)
+df$datetime <- as.POSIXct(as.numeric(as.character(df$timestamp)), origin="1970-01-01", 'GMT')
+df$date <- as.Date(df$datetime)
 
-df$time <- format(df$time,"%H:%M:%S")
+df$time <- format(df$datetime,"%H:%M:%S")
 ```
 
 

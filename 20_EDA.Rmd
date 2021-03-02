@@ -11,20 +11,20 @@ hist(log(df$distance))
 
 
 ```{r}
-df$hour <- df$time
-df$hour <- format(strptime(df$hour,"%Y-%m-%d %H:%M:%S"),'%H:%M')
+df$hour <- df$datetime
+df$hour <- format(strptime(df$hour,"%H:%M:%S"),'%H:%M')
 ```
 
 ```{r}
-df1 <- df %>% filter(name != 'Sid') %>% filter(other_device == 'c0:98:e5:42:01:03')
-#df1 <- df1 %>% group_by(hour) %>% filter(distance == min(distance))
+#remove child device as main device and filter to other device = the child device. This allows for isolation of the parent distance
+df1 <- df %>% filter(device != 'c0:98:e5:42:01:03') %>% filter(other_device == 'c0:98:e5:42:01:03')
 ```
 
 
 
 ```{r}
 #with legend for same graph
-pp <- ggplot(df1, aes(time, distance_m, size = .9, colour = name)) +
+pp <- ggplot(df1, aes(datetime, distance_m, size = .9, colour = device)) +
   geom_point(alpha = 0.7, show.legend = TRUE) +
   geom_hline(yintercept = 1, color = 'red') +
   theme_light() +
@@ -42,7 +42,7 @@ plot(pp)
 ```{r}
 #Both points overlayed into the same plot
 pq1 <- pp +
-  transition_reveal(time)+
+  transition_reveal(datetime)+
   theme(panel.grid.minor = element_blank(), panel.grid.major = element_blank()) +
   theme_light()
 
@@ -55,7 +55,7 @@ animate(pq1, duration = 25)
 
 ```{r}
 #without legend for facet graph
-pp <- ggplot(df1, aes(time, distance_m, size = .9, colour = name)) +
+pp <- ggplot(df1, aes(datetime, distance_m, size = .9, colour = device)) +
   geom_point(alpha = 0.7, show.legend = FALSE) +
   geom_hline(yintercept = 1, color = 'red') +
   theme_light() +
@@ -73,8 +73,8 @@ plot(pp)
 ```{r}
 #Points in separate graphs
 pq <- pp +
-  facet_wrap(~name) +
-  transition_reveal(time) 
+  facet_wrap(~device) +
+  transition_reveal(datetime) 
 
 
 
