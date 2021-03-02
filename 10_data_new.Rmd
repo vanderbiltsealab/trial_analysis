@@ -143,3 +143,4 @@ v_s <- df %>% filter(device == 'c0:98:e5:42:01:07') %>% filter(other_device == '
 s_z <- df %>% filter(device == 'c0:98:e5:42:01:03') %>% filter(other_device == 'c0:98:e5:42:01:06')
 s_v <- df %>% filter(device == 'c0:98:e5:42:01:03') %>% filter(other_device == 'c0:98:e5:42:01:07')
 ```
+

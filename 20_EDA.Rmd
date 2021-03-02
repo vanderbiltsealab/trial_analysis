@@ -11,8 +11,7 @@ hist(log(df$distance))
 
 
 ```{r}
-df$hour <- df$datetime
-df$hour <- format(strptime(df$hour,"%H:%M:%S"),'%H:%M')
+#df$hour <- format(strptime(df$datetime,"%H:%M:%S"),'%H:%M')
 ```
 
 ```{r}

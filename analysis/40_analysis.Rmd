@@ -1,24 +1,25 @@
 ---
-title: "40_sid_analysis"
+title: "40_child_analysis"
 output: html_notebook
 ---
 -------------------
 
-Sid with Virginia
+Child with Mother
+(child in motion, mother stationary)
 
 --------------------
 
 ```{r}
-merged <- merge(s_v, v_s, by = 'time_stamp')
+merged <- merge(s_v, v_s, by = 'timestamp')
 merged <- merged %>% filter(distance.x == distance.y)
 ```
 
 ```{r}
-sid_motion <- merged %>% filter(motion_category.x == 'Motion' & motion_category.y == 'Stationary')
+motion0307 <- merged %>% filter(motion.x == 1 & motion.y == 0)
 ```
 
 ```{r}
-t <- ggplot(sid_motion, aes(x=time.y, y=distance_m.x)) +
+t <- ggplot(motion0307, aes(x=timestamp, y=distance_m.x)) +
   geom_line(alpha = .7) + 
   xlab("") +
   geom_hline(yintercept = 1, color = 'red') +
@@ -29,60 +30,110 @@ t
 ```
 
 ```{r}
-for(i in 1:nrow(sid_motion)) {
-  if (sid_motion$distance_m.x[i] >= 1) {
-    sid_motion[i,'yn'] <- 1
+for(i in 1:nrow(motion0307)) {
+  if (motion0307$distance_m.x[i] >= 1) {
+    motion0307[i,'yn'] <- 1
   }
   else{
-    sid_motion[i,'yn'] <- 0 
+    motion0307[i,'yn'] <- 0 
   }
 }
 ```
 
 ```{r}
-sid_motion$sum <- rollapply(sid_motion$yn,3,sum, partial = TRUE, align = "right")
+motion0307$sum <- rollapply(motion0307$yn,3,sum, partial = TRUE, align = "right")
 ```
 
 ```{r}
 
-for(i in 1:nrow(sid_motion)) {
-  if ((sid_motion$sum[i] == 2) && (sid_motion$sum[i-1] == 3)) {
-    sid_motion[i,'loop'] <- 1
+for(i in 1:nrow(motion0307)) {
+  if ((motion0307$sum[i] == 2) && (motion0307$sum[i-1] == 3)) {
+    motion0307[i,'loop'] <- 1
   }
   else{
-   sid_motion[i,'loop'] <- 0 
+   motion0307[i,'loop'] <- 0 
   }
 }
 
-for(i in 1:nrow(sid_motion)) {
-  if ((sid_motion$loop[i] == 1) && (sid_motion$yn[i+1] == 1)) {
-    sid_motion[i,'loop'] <- 0
+for(i in 1:nrow(motion0307)) {
+  if ((motion0307$loop[i] == 1) && (motion0307$yn[i+1] == 1)) {
+    motion0307[i,'loop'] <- 0
   }
 }
 
 ```
 
 ```{r}
-sum(sid_motion$loop)
+sum(motion0307$loop)
 ```
+
+-------------------
+
+Child with Mother
+(both in motion)
 
 --------------------
 
-Sid with Zeke
+```{r}
+for(i in 1:nrow(merged)) {
+  if (merged$distance_m.x[i] >= 1) {
+    merged[i,'yn'] <- 1
+  }
+  else{
+    merged[i,'yn'] <- 0
+  }
+}
+```
+
+```{r}
+merged$sum <- rollapply(merged$yn,3,sum, partial = TRUE, align = "right")
+```
+
+```{r}
+
+for(i in 1:nrow(merged)) {
+  if ((merged$sum[i] == 2) && (merged$sum[i-1] == 3)) {
+    merged[i,'loop'] <- 1
+  }
+  else{
+    merged[i,'loop'] <- 0 
+  }
+}
+
+
+for(i in 1:nrow(merged)) {
+  if ((merged$loop[i] == 1) && (merged$yn[i+1] == 1)) {
+    merged[i,'loop'] <- 0
+  }
+}
+
+```
+
+```{r}
+sum(merged$loop)
+```
+
+
+
+
+--------------------
+
+Child with Father
+(child in motion, father stationary)
 
 --------------------
 
 ```{r}
-merged1 <- merge(s_z, z_s, by = 'time_stamp')
+merged1 <- merge(s_z, z_s, by = 'timestamp')
 merged1 <- merged1 %>% filter(distance.x == distance.y)
 ```
 
 ```{r}
-sid1_motion <- merged1 %>% filter(motion_category.x == 'Motion' & motion_category.y == 'Stationary')
+motion0306 <- merged1 %>% filter(motion.x == 1 & motion.y == 0)
 ```
 
 ```{r}
-t <- ggplot(sid1_motion, aes(x=time.y, y=distance_m.x)) +
+t <- ggplot(motion0306, aes(x=timestamp, y=distance_m.x)) +
   geom_line(alpha = .7) + 
   xlab("") +
   geom_hline(yintercept = 1, color = 'red') +
@@ -94,40 +145,87 @@ t
 
 
 ```{r}
-for(i in 1:nrow(sid1_motion)) {
-  if (sid1_motion$distance_m.x[i] >= 1) {
-    sid1_motion[i,'yn'] <- 1
+for(i in 1:nrow(motion0306)) {
+  if (motion0306$distance_m.x[i] >= 1) {
+    motion0306[i,'yn'] <- 1
   }
   else{
-   sid1_motion[i,'yn'] <- 0 
+   motion0306[i,'yn'] <- 0 
   }
 }
 
 ```
 
 ```{r}
-sid1_motion$sum <- rollapply(sid1_motion$yn,3,sum, partial = TRUE, align = "right")
+motion0306$sum <- rollapply(motion0306$yn,3,sum, partial = TRUE, align = "right")
 ```
 
 ```{r}
 
-for(i in 1:nrow(sid1_motion)) {
-  if ((sid1_motion$sum[i] == 2) && (sid1_motion$sum[i-1] == 3)) {
-    sid1_motion[i,'loop'] <- 1
+for(i in 1:nrow(motion0306)) {
+  if ((motion0306$sum[i] == 2) && (motion0306$sum[i-1] == 3)) {
+    motion0306[i,'loop'] <- 1
   }
   else{
-   sid1_motion[i,'loop'] <- 0 
+   motion0306[i,'loop'] <- 0 
   }
 }
 
-for(i in 1:nrow(sid1_motion)) {
-  if ((sid1_motion$loop[i] == 1) && (sid1_motion$yn[i+1] == 1)) {
-    sid1_motion[i,'loop'] <- 0
+for(i in 1:nrow(motion0306)) {
+  if ((motion0306$loop[i] == 1) && (motion0306$yn[i+1] == 1)) {
+    motion0306[i,'loop'] <- 0
   }
 }
 ```
 
 ```{r}
-sum(sid1_motion$loop)
+sum(motion0306$loop)
+```
+
+
+-------------------
+
+Child with Father
+(both in motion)
+
+--------------------
+
+```{r}
+for(i in 1:nrow(merged1)) {
+  if (merged1$distance_m.x[i] >= 1) {
+    merged1[i,'yn'] <- 1
+  }
+  else{
+    merged1[i,'yn'] <- 0
+  }
+}
+```
+
+```{r}
+merged1$sum <- rollapply(merged1$yn,3,sum, partial = TRUE, align = "right")
+```
+
+```{r}
+
+for(i in 1:nrow(merged1)) {
+  if ((merged1$sum[i] == 2) && (merged1$sum[i-1] == 3)) {
+    merged1[i,'loop'] <- 1
+  }
+  else{
+    merged1[i,'loop'] <- 0 
+  }
+}
+
+
+for(i in 1:nrow(merged1)) {
+  if ((merged1$loop[i] == 1) && (merged1$yn[i+1] == 1)) {
+    merged1[i,'loop'] <- 0
+  }
+}
+
+```
+
+```{r}
+sum(merged1$loop)
 ```
 

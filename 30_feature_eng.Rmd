@@ -3,14 +3,3 @@ title: "30_feature_eng"
 output: html_notebook
 ---
 
-
-```{r}
-df$distance_m <-df$distance*.001
-df %>% filter(df$distance_m <= 1) %>% summarise(n = n())
-```
-
-
-```{r}
-df$time <- as.POSIXct(as.numeric(as.character(df$time_stamp)), origin="1970-01-01")
-df <- as.data.frame(df)
-```
