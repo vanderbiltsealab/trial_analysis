@@ -5,21 +5,22 @@ output: html_notebook
 
 -------------------
 
-Virginia with Sid
+Mother with Child
+(mother in motion, child stationary)
 
 --------------------
 
 ```{r}
-merged2 <- merge(s_v, v_s, by = 'time_stamp')
+merged2 <- merge(s_v, v_s, by = 'timestamp')
 merged2 <- merged2 %>% filter(distance.x == distance.y)
 ```
 
 ```{r}
-v_motion <- merged2 %>% filter(motion_category.x == 'Stationary' & motion_category.y == 'Motion')
+motion_0703 <- merged2 %>% filter(motion.x == 0 & motion.y == 1)
 ```
 
 ```{r}
-t <- ggplot(v_motion, aes(x=time.y, y=distance_m.x)) +
+t <- ggplot(motion_0703, aes(x=timestamp, y=distance_m.x)) +
   geom_line(alpha = .7) + 
   xlab("") +
   geom_hline(yintercept = 1, color = 'red') +
@@ -30,40 +31,40 @@ t
 ```
 
 ```{r}
-for(i in 1:nrow(v_motion)) {
-  if (v_motion$distance_m.x[i] >= 1) {
-    v_motion[i,'yn'] <- 1
+for(i in 1:nrow(motion_0703)) {
+  if (motion_0703$distance_m.x[i] >= 1) {
+    motion_0703[i,'yn'] <- 1
   }
   else{
-    v_motion[i,'yn'] <- 0 
+    motion_0703[i,'yn'] <- 0 
   }
 }
 ```
 
 ```{r}
-v_motion$sum <- rollapply(v_motion$yn,3,sum, partial = TRUE, align = "right")
+motion_0703$sum <- rollapply(motion_0703$yn,3,sum, partial = TRUE, align = "right")
 ```
 
 ```{r}
 
-for(i in 1:nrow(v_motion)) {
-  if ((v_motion$sum[i] == 2) && (v_motion$sum[i-1] == 3)) {
-    v_motion[i,'loop'] <- 1
+for(i in 1:nrow(motion_0703)) {
+  if ((motion_0703$sum[i] == 2) && (motion_0703$sum[i-1] == 3)) {
+    motion_0703[i,'loop'] <- 1
   }
   else{
-    v_motion[i,'loop'] <- 0 
+    motion_0703[i,'loop'] <- 0 
   }
 }
 
-for(i in 1:nrow(v_motion)) {
-  if ((v_motion$loop[i] == 1) && (v_motion$yn[i+1] == 1)) {
-    v_motion[i,'loop'] <- 0
+for(i in 1:nrow(motion_0703)) {
+  if ((motion_0703$loop[i] == 1) && (motion_0703$yn[i+1] == 1)) {
+    motion_0703[i,'loop'] <- 0
   }
 }
 ```
 
 ```{r}
-sum(v_motion$loop)
+sum(motion_0703$loop)
 ```
 
 
