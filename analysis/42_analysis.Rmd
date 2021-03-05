@@ -5,21 +5,22 @@ output: html_notebook
 
 -------------------
 
-Zeke with Sid
+Father with Child
+(father in motion, child stationary)
 
 --------------------
 
 ```{r}
-merged3 <- merge(s_z, z_s, by = 'time_stamp') 
+merged3 <- merge(s_z, z_s, by = 'timestamp') 
 merged3 <- merged3 %>% filter(distance.x == distance.y)
 ```
 
 ```{r}
-z_motion <- merged3 %>% filter(motion_category.x == 'Stationary' & motion_category.y == 'Motion')
+motion_0603 <- merged3 %>% filter(motion.x == 0 & motion.y == 1)
 ```
 
 ```{r}
-t <- ggplot(z_motion, aes(x=time.y, y=distance_m.x)) +
+t <- ggplot(motion_0603, aes(x=timestamp, y=distance_m.x)) +
   geom_line(alpha = .7) + 
   xlab("") +
   geom_hline(yintercept = 1, color = 'red') +
@@ -31,40 +32,40 @@ t
 
 
 ```{r}
-for(i in 1:nrow(z_motion)) {
-  if (z_motion$distance_m.x[i] >= 1) {
-    z_motion[i,'yn'] <- 1
+for(i in 1:nrow(motion_0603)) {
+  if (motion_0603$distance_m.x[i] >= 1) {
+    motion_0603[i,'yn'] <- 1
   }
   else{
-    z_motion[i,'yn'] <- 0 
+    motion_0603[i,'yn'] <- 0 
   }
 }
 ```
 
 ```{r}
-z_motion$sum <- rollapply(z_motion$yn,3,sum, partial = TRUE, align = "right")
+motion_0603$sum <- rollapply(motion_0603$yn,3,sum, partial = TRUE, align = "right")
 ```
 
 ```{r}
 
-for(i in 1:nrow(z_motion)) {
-  if ((z_motion$sum[i] == 2) && (z_motion$sum[i-1] == 3)) {
-    z_motion[i,'loop'] <- 1
+for(i in 1:nrow(motion_0603)) {
+  if ((motion_0603$sum[i] == 2) && (motion_0603$sum[i-1] == 3)) {
+    motion_0603[i,'loop'] <- 1
   }
   else{
-    z_motion[i,'loop'] <- 0 
+    motion_0603[i,'loop'] <- 0 
   }
 }
 
-for(i in 1:nrow(z_motion)) {
-  if ((z_motion$loop[i] == 1) && (z_motion$yn[i+1] == 1)) {
-    z_motion[i,'loop'] <- 0
+for(i in 1:nrow(motion_0603)) {
+  if ((motion_0603$loop[i] == 1) && (motion_0603$yn[i+1] == 1)) {
+    motion_0603[i,'loop'] <- 0
   }
 }
 ```
 
 ```{r}
-sum(z_motion$loop)
+sum(motion_0603$loop)
 ```
 
 

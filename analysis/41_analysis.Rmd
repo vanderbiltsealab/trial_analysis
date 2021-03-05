@@ -68,6 +68,8 @@ sum(motion_0703$loop)
 ```
 
 
+Plot proportion of time spent in touching distance vs outside of touching distance
+
 ```{r}
 merged2$touching <- ifelse(merged2$distance_m.y <= 1, 1, 0)
 ```
