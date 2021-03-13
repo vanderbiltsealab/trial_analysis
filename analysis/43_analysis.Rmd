@@ -77,75 +77,8 @@ sum(mn$loop)
 ```
 
 
-
-
-**don't think the below works -- ignore for now
-
-
-
-
-```{r}
-#df$other_name <- ifelse(df$other_device == 'c0:98:e5:42:01:06', 'Zeke',ifelse(df$other_device == 'c0:98:e5:42:01:03', 'Sid','Virginia'))
-```
-
-```{r}
-df$status <- ifelse(df$device == 'c0:98:e5:42:01:06' | df$device == 'c0:98:e5:42:01:07', 'parent', 'child')
-```
-
-```{r}
-for(i in 1:nrow(df)) {
-  if (df$distance_m[i] >= 1) {
-    df[i,'yn'] <- 1
-  }
-  else{
-    df[i,'yn'] <- 0 
-  }
-}
-```
-
-
-```{r}
-df_all <- df %>% group_by(device, other_device) %>%
-       mutate(sum=rollapplyr(yn, 3, sum, partial=TRUE))
-```
-
-```{r}
-for(i in 1:nrow(df_all)) {
-  if ((df_all$sum[i] == 2) && (df_all$sum[i-2] == 3)) {
-    df_all[i,'loop'] <- 1
-  }
-  else{
-    df_all[i,'loop'] <- 0 
-  }
-}
-
-for(i in 1:nrow(df_all)) {
-  if ((df_all$loop[i] == 1) && (df_all$yn[i+2] == 1)) {
-    df_all[i,'loop'] <- 0
-  }
-}
-```
-
-```{r}
-sum(df_all$loop)
-```
-
-
-```{r}
-library(dplyr)
-wide <- reshape(df, idvar = "time_stamp", timevar = "name", direction = "wide") 
-wide %>% select(starts_with("other"), starts_with("distance_m"))
-
-```
-
-```{r}
-df%>% reshape(idvar = "time_stamp", timevar = "name", direction = "wide") 
-```
-
-
-
-
-**thinking through loop initiation and closing (arrivals and departures)
+**thinking through loop initiation and closing (arrivals and departures) 
+Note: this is using loops
 
 
 ```{r}
@@ -215,5 +148,26 @@ mn %>% count(arrival)
 ```
 
 
-
+```{r}
+for(i in 1:nrow(mn)){
+  if(is.na(mn$arrival[i])){
+      mn$arrival[i] = case_when(
+        grepl("07", mn$touching[i]) & mn$motion_03[i-2] == 1 & mn$motion_07[i-2] == 0 ~ "child",
+        grepl("07", mn$touching[i]) & mn$motion_03[i-2] == 0 & mn$motion_07[i-2] == 1 ~ "mother",
+        grepl("07", mn$touching[i]) & mn$motion_03[i-2] == 1 & mn$motion_07[i-2] == 1 ~ "multiple",
+        grepl("06", mn$touching[i]) & mn$motion_03[i-2] == 1 & mn$motion_06[i-2] == 0 ~ "child",
+        grepl("06", mn$touching[i]) & mn$motion_03[i-2] == 0 & mn$motion_06[i-2] == 1 ~ "father",
+        grepl("06", mn$touching[i]) & mn$motion_03[i-2] == 1 & mn$motion_06[i-2] == 1 ~ "multiple",
+        grepl("both", mn$touching[i]) & mn$motion_03[i-2] == 1 & mn$motion_06[i-2] == 0 & mn$motion_07[i-2] == 0 ~ "child",
+        grepl("both", mn$touching[i]) & mn$motion_03[i-2] == 0 & mn$motion_06[i-2] == 1 & mn$motion_07[i-2] == 0 ~ "father",
+        grepl("both", mn$touching[i]) & mn$motion_03[i-2] == 0 & mn$motion_06[i-2] == 0 & mn$motion_07[i-2] == 1 ~ "mother",
+        grepl("both", mn$touching[i]) & mn$motion_03[i-2] == 1 & mn$motion_06[i-2] == 1 & mn$motion_07[i-2] == 0 ~ "multiple",
+        grepl("both", mn$touching[i]) & mn$motion_03[i-2] == 0 & mn$motion_06[i-2] == 1 & mn$motion_07[i-2] == 1 ~ "multiple",
+        grepl("both", mn$touching[i]) & mn$motion_03[i-2] == 1 & mn$motion_06[i-2] == 0 & mn$motion_07[i-2] == 1 ~ "multiple",
+        grepl("both", mn$touching[i]) & mn$motion_03[i-2] == 1 & mn$motion_06[i-2] == 1 & mn$motion_07[i-2] == 1 ~ "multiple"
+    )
+  }
+}
+mn %>% count(arrival)
+```
 
