@@ -1,0 +1,38 @@
+---
+title: "44_check-ins"
+output: html_notebook
+---
+
+A "check-in" is when one or more parents are in touching distance - this will have the opposite label of the "yn" variable
+
+```{r}
+mn$checkin <- ifelse((mn$distance_06 < 1 | mn$distance_07 <1),1,0)
+
+```
+
+```{r}
+table(mn$checkin)
+```
+
+```{r}
+ggplot(mn, aes(checkin, y = ..prop..)) +
+  geom_bar(width = .5) +
+  theme_light() +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
+  scale_y_continuous(labels = scales::percent_format())
+```
+
+When either parent was within touching distance of the child, how often was each person in motion?
+
+```{r}
+mn %>% filter(checkin ==1) %>% filter(motion_03 ==1) %>% summarise(n()/nrow(mn %>% filter(checkin ==1)))
+mn %>% filter(checkin ==1) %>% filter(motion_06 ==1) %>% summarise(n()/nrow(mn %>% filter(checkin ==1)))
+mn %>% filter(checkin ==1) %>% filter(motion_07 ==1) %>% summarise(n()/nrow(mn %>% filter(checkin ==1)))
+```
+
+Child = 10%
+Father = 20.8%
+Mother = 21.9%
+
+
+
