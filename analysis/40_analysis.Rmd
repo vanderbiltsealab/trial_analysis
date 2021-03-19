@@ -28,44 +28,41 @@ t <- ggplot(motion0307, aes(x=timestamp, y=distance_m.x)) +
         axis.line = element_line(colour = "black"))
 t
 ```
-
 ```{r}
-for(i in 1:nrow(motion0307)) {
-  if (motion0307$distance_m.x[i] >= 1) {
-    motion0307[i,'yn'] <- 1
+#label touching distance yes or no
+for(i in 1:nrow(merged)) {
+  if (merged$motion.x[i] == 1 & merged$motion.y[i] == 0 & merged$distance_m.x[i] >= 1) {
+    merged[i,'yn'] <- 1
   }
   else{
-    motion0307[i,'yn'] <- 0 
+    merged[i,'yn'] <- 0 
   }
 }
-```
+#count 3 seconds outside of touching distance
+merged$sum <- rollapply(merged$yn,3,sum, partial = TRUE, align = "right")
 
-```{r}
-motion0307$sum <- rollapply(motion0307$yn,3,sum, partial = TRUE, align = "right")
-```
-
-```{r}
-
-for(i in 1:nrow(motion0307)) {
-  if ((motion0307$sum[i] == 2) && (motion0307$sum[i-1] == 3)) {
-    motion0307[i,'loop'] <- 1
+#determine loop
+for(i in 1:nrow(merged)) {
+  if ((merged$sum[i] == 2) && (merged$sum[i-1] == 3)) {
+    merged[i,'loop'] <- 1
   }
   else{
-   motion0307[i,'loop'] <- 0 
+   merged[i,'loop'] <- 0 
   }
 }
 
-for(i in 1:nrow(motion0307)) {
-  if ((motion0307$loop[i] == 1) && (motion0307$yn[i+1] == 1)) {
-    motion0307[i,'loop'] <- 0
+#ensure that loop includes at least 2 seconds of contact
+for(i in 1:nrow(merged)) {
+  if ((merged$loop[i] == 1) && (merged$yn[i+1] == 1)) {
+    merged[i,'loop'] <- 0
   }
 }
 
+#sum number of loops
+sum(merged$loop)
+
 ```
 
-```{r}
-sum(motion0307$loop)
-```
 
 -------------------
 
@@ -74,6 +71,7 @@ Child with Mother
 
 --------------------
 
+Repeat process but allow both parties to be in motion -- this will be higher than the two separate cases because there are cases where they can meet in the middle 
 ```{r}
 for(i in 1:nrow(merged)) {
   if (merged$distance_m.x[i] >= 1) {
@@ -142,45 +140,41 @@ t <- ggplot(motion0306, aes(x=timestamp, y=distance_m.x)) +
         axis.line = element_line(colour = "black"))
 t
 ```
-
-
 ```{r}
-for(i in 1:nrow(motion0306)) {
-  if (motion0306$distance_m.x[i] >= 1) {
-    motion0306[i,'yn'] <- 1
+#label touching distance yes or no
+for(i in 1:nrow(merged1)) {
+  if (merged1$motion.x[i] == 1 & merged1$motion.y[i] == 0 & merged1$distance_m.x[i] >= 1) {
+    merged1[i,'yn'] <- 1
   }
   else{
-   motion0306[i,'yn'] <- 0 
+    merged1[i,'yn'] <- 0 
   }
 }
+#count 3 seconds outside of touching distance
+merged1$sum <- rollapply(merged1$yn,3,sum, partial = TRUE, align = "right")
 
-```
-
-```{r}
-motion0306$sum <- rollapply(motion0306$yn,3,sum, partial = TRUE, align = "right")
-```
-
-```{r}
-
-for(i in 1:nrow(motion0306)) {
-  if ((motion0306$sum[i] == 2) && (motion0306$sum[i-1] == 3)) {
-    motion0306[i,'loop'] <- 1
+#determine loop
+for(i in 1:nrow(merged1)) {
+  if ((merged1$sum[i] == 2) && (merged1$sum[i-1] == 3)) {
+    merged1[i,'loop'] <- 1
   }
   else{
-   motion0306[i,'loop'] <- 0 
+   merged1[i,'loop'] <- 0 
   }
 }
 
-for(i in 1:nrow(motion0306)) {
-  if ((motion0306$loop[i] == 1) && (motion0306$yn[i+1] == 1)) {
-    motion0306[i,'loop'] <- 0
+#ensure that loop includes at least 2 seconds of contact
+for(i in 1:nrow(merged1)) {
+  if ((merged1$loop[i] == 1) && (merged1$yn[i+1] == 1)) {
+    merged1[i,'loop'] <- 0
   }
 }
+
+#sum number of loops
+sum(merged1$loop)
+
 ```
 
-```{r}
-sum(motion0306$loop)
-```
 
 
 -------------------
