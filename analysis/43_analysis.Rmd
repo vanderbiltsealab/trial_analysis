@@ -78,7 +78,7 @@ sum(mn$loop)
 
 
 **thinking through loop initiation and closing (arrivals and departures) 
-Note: this is using loops
+Note: this is using loops as an indicator of arrival
 
 
 ```{r}

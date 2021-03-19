@@ -34,5 +34,70 @@ Child = 10%
 Father = 20.8%
 Mother = 21.9%
 
+__________________________________________
 
+Departures
+
+__________________________________________
+
+Look at who is in touching distance at every second during a check-in 
+```{r}
+
+mn_new <- mn %>% mutate(
+  touching = case_when(
+  grepl(1, checkin) & (distance_06 < 1 & distance_07 < 1) ~ "both",
+  grepl(1, checkin) & distance_07 < 1 ~ "07",
+  grepl(1, checkin) & distance_06 < 1 ~ "06",
+  grepl(0, checkin) ~ ""))
+
+mn_new %>% count(touching)
+
+```
+
+```{r}
+mn_new <- mn_new %>% mutate(
+  departure = case_when(
+  grepl("07", touching) & motion_03 == 1 & motion_07 == 0 ~ "child",
+  grepl("07", touching) & motion_03 == 0 & motion_07 == 1 ~ "mother",
+  grepl("07", touching) & motion_03 == 1 & motion_07 == 1 ~ "multiple",
+  grepl("06", touching) & motion_03 == 1 & motion_06 == 0 ~ "child",
+  grepl("06", touching) & motion_03 == 0 & motion_06 == 1 ~ "father",
+  grepl("06", touching) & motion_03 == 1 & motion_06 == 1 ~ "multiple",
+  grepl("both", touching) & motion_03 == 1 & motion_06 == 0 & motion_07 == 0 ~ "child",
+  grepl("both", touching) & motion_03 == 0 & motion_06 == 1 & motion_07 == 0 ~ "father",
+  grepl("both", touching) & motion_03 == 0 & motion_06 == 0 & motion_07 == 1 ~ "mother",
+  grepl("both", touching) & motion_03 == 1 & motion_06 == 1 & motion_07 == 0 ~ "multiple",
+  grepl("both", touching) & motion_03 == 0 & motion_06 == 1 & motion_07 == 1 ~ "multiple",
+  grepl("both", touching) & motion_03 == 1 & motion_06 == 0 & motion_07 == 1 ~ "multiple",
+  grepl("both", touching) & motion_03 == 1 & motion_06 == 1 & motion_07 == 1 ~ "multiple",
+  grepl(1, loop) ~ "none",
+  grepl(0, loop) ~ "none"))
+
+#mn %>% count(arrival)
+```
+
+
+```{r}
+rows <- nrow(mn_new) -1
+for(i in 1:rows) {
+  if((mn_new$checkin[i] == 1) & (mn_new$checkin[i+1] == 0) & (mn_new$checkin[i+2] == 0)){
+    mn_new[i,'departure'] <- mn_new$departure[i]
+  }else{
+    mn_new[i,'departure'] <- ""
+  }
+}
+```
+
+```{r}
+#I have no idea why this isn't working.... right now there are just too many departures
+for(i in 1:rows) {
+  if((mn_new$departure[i] != "") & (mn_new$checkin[i-1] == 0)){
+    mn_new[i,'departure'] <- NA
+  }
+}
+```
+
+```{r}
+table(mn_new$departure)
+```
 
