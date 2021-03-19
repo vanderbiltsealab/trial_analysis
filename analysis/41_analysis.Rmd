@@ -29,43 +29,43 @@ t <- ggplot(motion_0703, aes(x=timestamp, y=distance_m.x)) +
         axis.line = element_line(colour = "black"))
 t
 ```
-
 ```{r}
-for(i in 1:nrow(motion_0703)) {
-  if (motion_0703$distance_m.x[i] >= 1) {
-    motion_0703[i,'yn'] <- 1
+#label touching distance yes or no
+for(i in 1:nrow(merged2)) {
+  if (merged2$motion.x[i] == 0 & merged2$motion.y[i] == 1 & merged2$distance_m.x[i] >= 1) {
+    merged2[i,'yn'] <- 1
   }
   else{
-    motion_0703[i,'yn'] <- 0 
+    merged2[i,'yn'] <- 0 
   }
 }
-```
+#count 3 seconds outside of touching distance
+merged2$sum <- rollapply(merged2$yn,3,sum, partial = TRUE, align = "right")
 
-```{r}
-motion_0703$sum <- rollapply(motion_0703$yn,3,sum, partial = TRUE, align = "right")
-```
-
-```{r}
-
-for(i in 1:nrow(motion_0703)) {
-  if ((motion_0703$sum[i] == 2) && (motion_0703$sum[i-1] == 3)) {
-    motion_0703[i,'loop'] <- 1
+#determine loop
+for(i in 1:nrow(merged2)) {
+  if ((merged2$sum[i] == 2) && (merged2$sum[i-1] == 3)) {
+    merged2[i,'loop'] <- 1
   }
   else{
-    motion_0703[i,'loop'] <- 0 
+   merged2[i,'loop'] <- 0 
   }
 }
 
-for(i in 1:nrow(motion_0703)) {
-  if ((motion_0703$loop[i] == 1) && (motion_0703$yn[i+1] == 1)) {
-    motion_0703[i,'loop'] <- 0
+#ensure that loop includes at least 2 seconds of contact
+for(i in 1:nrow(merged2)) {
+  if ((merged2$loop[i] == 1) && (merged2$yn[i+1] == 1)) {
+    merged2[i,'loop'] <- 0
   }
 }
+
+#sum number of loops
+sum(merged2$loop)
+
 ```
 
-```{r}
-sum(motion_0703$loop)
-```
+
+
 
 
 Plot proportion of time spent in touching distance vs outside of touching distance
@@ -83,6 +83,9 @@ ggplot(merged2, aes(touching, y = ..prop..)) +
   scale_y_continuous(labels = scales::percent_format())
 ```
 
+```{r}
+prop.table(table(merged2$touching)) %>% round(2)
+```
 
 
 
