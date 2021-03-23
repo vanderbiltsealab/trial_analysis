@@ -1,0 +1,48 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+Metric creation
+
+```{r}
+metric <- function(seconds) {
+  mn$sum <- rollapply(mn$yn,seconds,sum, partial = TRUE, align = "right")
+  for(i in 1:nrow(mn)) {
+  if ((mn$sum[i] == (seconds - 1)) && (mn$sum[i-1] == seconds)) {
+    mn[i,'loop'] <- 1
+  }
+  else{
+    mn[i,'loop'] <- 0 
+  }
+}
+
+
+for(i in 1:nrow(mn)) {
+  if ((mn$loop[i] == 1) && (mn$yn[i+1] == 1)) {
+    mn[i,'loop'] <- 0
+  }
+}
+  sum(mn$loop)
+}
+```
+
+```{r}
+loop_count <- c()
+second <- seq(3, 10, by=1)
+for(f in second){
+  loop_count <- append(loop_count, metric(f))
+}
+loop_count
+```
+
+
+```{r}
+ggplot() +
+  geom_point(aes(x = second, y = loop_count)) +
+  xlab('Seconds') + ylab('Loops') +
+  theme_minimal() +
+  ggtitle('Total Loops Made by Number of Seconds Spent out of Touching Distance') +
+  theme(panel.grid.minor.y = element_blank())
+```
+

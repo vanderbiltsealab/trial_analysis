@@ -22,6 +22,10 @@ ggplot(mn, aes(checkin, y = ..prop..)) +
   scale_y_continuous(labels = scales::percent_format())
 ```
 
+```{r}
+prop.table(table(mn$checkin)) %>% round(2)
+```
+
 When either parent was within touching distance of the child, how often was each person in motion?
 
 ```{r}
