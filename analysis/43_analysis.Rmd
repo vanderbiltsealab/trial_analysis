@@ -11,7 +11,8 @@ All family members loops with child
 
 
 ```{r}
-m <- inner_join(s_z, z_s, by = 'timestamp')
+m <- merge(s_z, z_s, by = "timestamp", all = TRUE)
+#m <- inner_join(s_z, z_s, by = 'timestamp')
 m <- m %>% filter(distance.x == distance.y)
 m <- m %>% select(timestamp, device.x, device.y, motion.x, motion.y, other_device.x, other_device.y, distance_m.x, time.x)
 m <-m %>% rename(time = time.x, distance = distance_m.x )
@@ -21,7 +22,8 @@ m <- reshape(m, idvar = "timestamp", timevar = "device.y", direction = "wide")
 
 
 ```{r}
-n <- inner_join(s_v, v_s, by = 'timestamp')
+n <- merge(s_v, v_s, by = "timestamp", all = TRUE)
+#n <- inner_join(s_v, v_s, by = 'timestamp')
 n <- n %>% filter(distance.x == distance.y)
 n <- n %>% select(timestamp, device.x, device.y, motion.x, motion.y, other_device.x, other_device.y, distance_m.x, time.x)
 n <- n %>% rename(time = time.x, distance = distance_m.x )
@@ -29,15 +31,17 @@ n <- reshape(n, idvar = "timestamp", timevar = "device.y", direction = "wide")
 ```
 
 ```{r}
-mn <-inner_join(m,n, by = 'timestamp') %>% 
+mn <- merge(m, n, by = "timestamp", all = TRUE) %>%
+#mn <-inner_join(m,n, by = 'timestamp') %>% 
   select(-c('timestamp', starts_with('other_device'), 'time.c0:98:e5:42:01:07', 'device.x.c0:98:e5:42:01:07', 'motion.x.c0:98:e5:42:01:07'))
 mn <- mn %>% rename(time = 'time.c0:98:e5:42:01:06', motion_03 = 'motion.x.c0:98:e5:42:01:06', motion_06 = 'motion.y.c0:98:e5:42:01:06', motion_07 = 'motion.y.c0:98:e5:42:01:07', device = 'device.x.c0:98:e5:42:01:06', distance_06 = 'distance.c0:98:e5:42:01:06', distance_07 = 'distance.c0:98:e5:42:01:07')
 
+mn <- mn %>% filter(!is.na(device))
 ```
 
 ```{r}
 for(i in 1:nrow(mn)) {
-  if ((mn$distance_06[i] >= 1) & (mn$distance_07[i] >= 1)) {
+  if (((mn$distance_06[i] >= 1) | (is.na(mn$distance_06[i]))) & ((mn$distance_07[i] >= 1) | (is.na(mn$distance_07[i])))) {
     mn[i,'yn'] <- 1
   }
   else{
@@ -106,17 +110,17 @@ mn <- mn %>% mutate(
   arrival = case_when(
   grepl("07", touching) & motion_03 == 1 & motion_07 == 0 ~ "child",
   grepl("07", touching) & motion_03 == 0 & motion_07 == 1 ~ "mother",
-  grepl("07", touching) & motion_03 == 1 & motion_07 == 1 ~ "multiple",
+  grepl("07", touching) & motion_03 == 1 & motion_07 == 1 ~ "multiple_child",
   grepl("06", touching) & motion_03 == 1 & motion_06 == 0 ~ "child",
   grepl("06", touching) & motion_03 == 0 & motion_06 == 1 ~ "father",
-  grepl("06", touching) & motion_03 == 1 & motion_06 == 1 ~ "multiple",
+  grepl("06", touching) & motion_03 == 1 & motion_06 == 1 ~ "multiple_child",
   grepl("both", touching) & motion_03 == 1 & motion_06 == 0 & motion_07 == 0 ~ "child",
   grepl("both", touching) & motion_03 == 0 & motion_06 == 1 & motion_07 == 0 ~ "father",
   grepl("both", touching) & motion_03 == 0 & motion_06 == 0 & motion_07 == 1 ~ "mother",
-  grepl("both", touching) & motion_03 == 1 & motion_06 == 1 & motion_07 == 0 ~ "multiple",
-  grepl("both", touching) & motion_03 == 0 & motion_06 == 1 & motion_07 == 1 ~ "multiple",
-  grepl("both", touching) & motion_03 == 1 & motion_06 == 0 & motion_07 == 1 ~ "multiple",
-  grepl("both", touching) & motion_03 == 1 & motion_06 == 1 & motion_07 == 1 ~ "multiple",
+  grepl("both", touching) & motion_03 == 1 & motion_06 == 1 & motion_07 == 0 ~ "multiple_child",
+  grepl("both", touching) & motion_03 == 0 & motion_06 == 1 & motion_07 == 1 ~ "multiple_parents",
+  grepl("both", touching) & motion_03 == 1 & motion_06 == 0 & motion_07 == 1 ~ "multiple_child",
+  grepl("both", touching) & motion_03 == 1 & motion_06 == 1 & motion_07 == 1 ~ "multiple_child",
   grepl(1, loop) ~ "none",
   grepl(0, loop) ~ ""))
 
@@ -130,17 +134,17 @@ for(i in 1:nrow(mn)){
       mn$arrival[i] = case_when(
         grepl("07", mn$touching[i]) & mn$motion_03[i-1] == 1 & mn$motion_07[i-1] == 0 ~ "child",
         grepl("07", mn$touching[i]) & mn$motion_03[i-1] == 0 & mn$motion_07[i-1] == 1 ~ "mother",
-        grepl("07", mn$touching[i]) & mn$motion_03[i-1] == 1 & mn$motion_07[i-1] == 1 ~ "multiple",
+        grepl("07", mn$touching[i]) & mn$motion_03[i-1] == 1 & mn$motion_07[i-1] == 1 ~ "multiple_child",
         grepl("06", mn$touching[i]) & mn$motion_03[i-1] == 1 & mn$motion_06[i-1] == 0 ~ "child",
         grepl("06", mn$touching[i]) & mn$motion_03[i-1] == 0 & mn$motion_06[i-1] == 1 ~ "father",
-        grepl("06", mn$touching[i]) & mn$motion_03[i-1] == 1 & mn$motion_06[i-1] == 1 ~ "multiple",
+        grepl("06", mn$touching[i]) & mn$motion_03[i-1] == 1 & mn$motion_06[i-1] == 1 ~ "multiple_child",
         grepl("both", mn$touching[i]) & mn$motion_03[i-1] == 1 & mn$motion_06[i-1] == 0 & mn$motion_07[i-1] == 0 ~ "child",
         grepl("both", mn$touching[i]) & mn$motion_03[i-1] == 0 & mn$motion_06[i-1] == 1 & mn$motion_07[i-1] == 0 ~ "father",
         grepl("both", mn$touching[i]) & mn$motion_03[i-1] == 0 & mn$motion_06[i-1] == 0 & mn$motion_07[i-1] == 1 ~ "mother",
-        grepl("both", mn$touching[i]) & mn$motion_03[i-1] == 1 & mn$motion_06[i-1] == 1 & mn$motion_07[i-1] == 0 ~ "multiple",
-        grepl("both", mn$touching[i]) & mn$motion_03[i-1] == 0 & mn$motion_06[i-1] == 1 & mn$motion_07[i-1] == 1 ~ "multiple",
-        grepl("both", mn$touching[i]) & mn$motion_03[i-1] == 1 & mn$motion_06[i-1] == 0 & mn$motion_07[i-1] == 1 ~ "multiple",
-        grepl("both", mn$touching[i]) & mn$motion_03[i-1] == 1 & mn$motion_06[i-1] == 1 & mn$motion_07[i-1] == 1 ~ "multiple"
+        grepl("both", mn$touching[i]) & mn$motion_03[i-1] == 1 & mn$motion_06[i-1] == 1 & mn$motion_07[i-1] == 0 ~ "multiple_child",
+        grepl("both", mn$touching[i]) & mn$motion_03[i-1] == 0 & mn$motion_06[i-1] == 1 & mn$motion_07[i-1] == 1 ~ "multiple_parents",
+        grepl("both", mn$touching[i]) & mn$motion_03[i-1] == 1 & mn$motion_06[i-1] == 0 & mn$motion_07[i-1] == 1 ~ "multiple_child",
+        grepl("both", mn$touching[i]) & mn$motion_03[i-1] == 1 & mn$motion_06[i-1] == 1 & mn$motion_07[i-1] == 1 ~ "multiple_child"
     )
   }
 }
@@ -154,17 +158,17 @@ for(i in 1:nrow(mn)){
       mn$arrival[i] = case_when(
         grepl("07", mn$touching[i]) & mn$motion_03[i-2] == 1 & mn$motion_07[i-2] == 0 ~ "child",
         grepl("07", mn$touching[i]) & mn$motion_03[i-2] == 0 & mn$motion_07[i-2] == 1 ~ "mother",
-        grepl("07", mn$touching[i]) & mn$motion_03[i-2] == 1 & mn$motion_07[i-2] == 1 ~ "multiple",
+        grepl("07", mn$touching[i]) & mn$motion_03[i-2] == 1 & mn$motion_07[i-2] == 1 ~ "multiple_child",
         grepl("06", mn$touching[i]) & mn$motion_03[i-2] == 1 & mn$motion_06[i-2] == 0 ~ "child",
         grepl("06", mn$touching[i]) & mn$motion_03[i-2] == 0 & mn$motion_06[i-2] == 1 ~ "father",
-        grepl("06", mn$touching[i]) & mn$motion_03[i-2] == 1 & mn$motion_06[i-2] == 1 ~ "multiple",
+        grepl("06", mn$touching[i]) & mn$motion_03[i-2] == 1 & mn$motion_06[i-2] == 1 ~ "multiple_child",
         grepl("both", mn$touching[i]) & mn$motion_03[i-2] == 1 & mn$motion_06[i-2] == 0 & mn$motion_07[i-2] == 0 ~ "child",
         grepl("both", mn$touching[i]) & mn$motion_03[i-2] == 0 & mn$motion_06[i-2] == 1 & mn$motion_07[i-2] == 0 ~ "father",
         grepl("both", mn$touching[i]) & mn$motion_03[i-2] == 0 & mn$motion_06[i-2] == 0 & mn$motion_07[i-2] == 1 ~ "mother",
-        grepl("both", mn$touching[i]) & mn$motion_03[i-2] == 1 & mn$motion_06[i-2] == 1 & mn$motion_07[i-2] == 0 ~ "multiple",
-        grepl("both", mn$touching[i]) & mn$motion_03[i-2] == 0 & mn$motion_06[i-2] == 1 & mn$motion_07[i-2] == 1 ~ "multiple",
-        grepl("both", mn$touching[i]) & mn$motion_03[i-2] == 1 & mn$motion_06[i-2] == 0 & mn$motion_07[i-2] == 1 ~ "multiple",
-        grepl("both", mn$touching[i]) & mn$motion_03[i-2] == 1 & mn$motion_06[i-2] == 1 & mn$motion_07[i-2] == 1 ~ "multiple"
+        grepl("both", mn$touching[i]) & mn$motion_03[i-2] == 1 & mn$motion_06[i-2] == 1 & mn$motion_07[i-2] == 0 ~ "multiple_child",
+        grepl("both", mn$touching[i]) & mn$motion_03[i-2] == 0 & mn$motion_06[i-2] == 1 & mn$motion_07[i-2] == 1 ~ "multiple_parents",
+        grepl("both", mn$touching[i]) & mn$motion_03[i-2] == 1 & mn$motion_06[i-2] == 0 & mn$motion_07[i-2] == 1 ~ "multiple_child",
+        grepl("both", mn$touching[i]) & mn$motion_03[i-2] == 1 & mn$motion_06[i-2] == 1 & mn$motion_07[i-2] == 1 ~ "multiple_child"
     )
   }
 }

@@ -34,9 +34,9 @@ mn %>% filter(checkin ==1) %>% filter(motion_06 ==1) %>% summarise(n()/nrow(mn %
 mn %>% filter(checkin ==1) %>% filter(motion_07 ==1) %>% summarise(n()/nrow(mn %>% filter(checkin ==1)))
 ```
 
-Child = 10%
-Father = 20.8%
-Mother = 21.9%
+Child = 11%
+Father = 22%
+Mother = 18%
 
 __________________________________________
 
@@ -50,8 +50,8 @@ Look at who is in touching distance at every second during a check-in
 mn_new <- mn %>% mutate(
   touching = case_when(
   grepl(1, checkin) & (distance_06 < 1 & distance_07 < 1) ~ "both",
-  grepl(1, checkin) & distance_07 < 1 ~ "07",
-  grepl(1, checkin) & distance_06 < 1 ~ "06",
+  grepl(1, checkin) & (distance_07 < 1 & (distance_06 >= 1 | is.na(distance_06))) ~ "07",
+  grepl(1, checkin) & (distance_06 < 1 & (distance_07 >= 1 | is.na(distance_07))) ~ "06",
   grepl(0, checkin) ~ ""))
 
 mn_new %>% count(touching)
@@ -70,10 +70,10 @@ mn_new <- mn_new %>% mutate(
   grepl("both", touching) & motion_03 == 1 & motion_06 == 0 & motion_07 == 0 ~ "child",
   grepl("both", touching) & motion_03 == 0 & motion_06 == 1 & motion_07 == 0 ~ "father",
   grepl("both", touching) & motion_03 == 0 & motion_06 == 0 & motion_07 == 1 ~ "mother",
-  grepl("both", touching) & motion_03 == 1 & motion_06 == 1 & motion_07 == 0 ~ "multiple",
-  grepl("both", touching) & motion_03 == 0 & motion_06 == 1 & motion_07 == 1 ~ "multiple",
-  grepl("both", touching) & motion_03 == 1 & motion_06 == 0 & motion_07 == 1 ~ "multiple",
-  grepl("both", touching) & motion_03 == 1 & motion_06 == 1 & motion_07 == 1 ~ "multiple",
+  grepl("both", touching) & motion_03 == 1 & motion_06 == 1 & motion_07 == 0 ~ "multiple_child",
+  grepl("both", touching) & motion_03 == 0 & motion_06 == 1 & motion_07 == 1 ~ "multiple_parents",
+  grepl("both", touching) & motion_03 == 1 & motion_06 == 0 & motion_07 == 1 ~ "multiple_child",
+  grepl("both", touching) & motion_03 == 1 & motion_06 == 1 & motion_07 == 1 ~ "multiple_child",
   grepl(1, loop) ~ "none",
   grepl(0, loop) ~ "none"))
 
@@ -103,5 +103,6 @@ for(i in 1:rows) {
 
 ```{r}
 table(mn_new$departure)
+table(mn_new$arrival)
 ```
 
