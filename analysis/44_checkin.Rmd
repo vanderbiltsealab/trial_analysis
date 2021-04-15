@@ -167,6 +167,23 @@ for(i in 1:nrow(mn)){
 }
 mn %>% count(arrival)
 ```
+
+```{r}
+mn$arrival[1] <- "start"
+```
+
+
+```{r}
+rows <- nrow(mn_new) -1
+for(i in 1:rows) {
+  if(is.na(mn$arrival[i])){
+    mn$arrival[i] <- "none"
+  }
+}
+```
+
+
+
 __________________________________________
 
 Departures
@@ -264,6 +281,8 @@ for(i in 1:rows) {
     mn_new[i,'in_loop'] <- ""
   }
 }
+
+
 
 
 ```

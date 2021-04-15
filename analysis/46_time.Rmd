@@ -1,0 +1,61 @@
+---
+title: "46-time-of-day"
+output: html_notebook
+---
+
+
+```{r}
+#morning
+morning <- mn %>% filter(time < ('12:00:00')) 
+sum(morning$loop)
+```
+
+
+
+_________________________________
+
+Create final dataframe
+
+_________________________________
+
+
+
+```{r}
+mn3 <- mn_new %>% filter((arrival != "") | (departure != ""))
+
+
+
+for(i in 1:(nrow(mn3)-1)){
+  if((mn3$arrival[i] != "")){
+    mn3$departure[i+1] = mn3$departure[i+1]
+  }else{
+    mn3$departure[i+1] = ""
+  }
+}
+
+
+mn3 <- mn3 %>% filter((arrival != "") | (departure != ""))
+
+mn3 <- mn3[-nrow(mn3),]
+
+mn_a <- mn3 %>% filter(arrival != "")
+mn_d <- mn3 %>% filter(departure != "")
+
+mn_a$time <- as.POSIXct(mn_a$time, format = "%H:%M:%S")
+
+
+mn_d$time <- as.POSIXct(mn_d$time, format = "%H:%M:%S")
+
+```
+
+
+
+```{r}
+final_dataframe <- data.frame("start_time" = mn_a$time,
+                              "end_time" = mn_d$time,
+                              "arrival" = mn_a$arrival,
+                              "departure" = mn_d$departure,
+                              "duration" = as.numeric(mn_d$time - mn_a$time))
+final_dataframe
+```
+
