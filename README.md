@@ -1,6 +1,6 @@
 # Capstone
 
-My primary goal with this project is to determine "loops" between parents and children. It is well-known that there is a "circle of security" that children have which is near to a parent. Here, we consider that circle to be when a child is within touching distance of a parent (roughly 1 meter). Here, I find these loops within the data and attempt to analyze who "departs" or walks out of touching distance, and who "arrives" or comes back within touching distance.
+My primary goal with this project is to determine "loops" between parents and children. It is well-known that there is a "circle of security" that children have which is when they are near to a parent. Here, we consider that circle to be when a child is within touching distance of a parent (roughly 1 meter). Here, I find these loops within the data and attempt to analyze who "departs" or walks out of touching distance, and who "arrives" or comes back within touching distance.
 
 [1. Data](https://github.com/amandashort/capstone/tree/main/data)
 
