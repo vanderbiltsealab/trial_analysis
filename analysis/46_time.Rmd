@@ -59,3 +59,33 @@ final_dataframe <- data.frame("start_time" = mn_a$time,
 final_dataframe
 ```
 
+
+```{r}
+final_data_arr <- final_dataframe %>% filter(arrival != "none") %>% filter(arrival != "start")
+ggplot(final_data_arr, aes(arrival)) +
+  geom_bar(fill = "darkslategray4") +
+  xlab("Arrival") +
+  ylab("Count") +
+  theme_light() +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
+  scale_x_discrete(labels=c("child" = "Child", "father" = "Father",
+                              "mother" = "Mother", "multiple_child" = "Multiple (Child)", "multiple_parents" = "Multiple (No Child)"))
+
+```
+
+```{r}
+final_data_dep <- final_dataframe %>% filter(departure != "none")
+ggplot(final_data_dep, aes(departure)) +
+  geom_bar(fill = "darkslategray4") +
+  xlab("Departure") +
+  ylab("Count") +
+  theme_light() +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
+  scale_x_discrete(labels=c("child" = "Child", "father" = "Father",
+                              "mother" = "Mother", "multiple_child" = "Multiple (Child)", "multiple_parents" = "Multiple (No Child)"))
+
+```
+
+
+
+
