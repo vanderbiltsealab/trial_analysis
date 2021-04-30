@@ -24,6 +24,9 @@ Ultimately, we are interested in everyone interacting at once. This means that t
 
 Since much of this project was based on metrics created by the team, I wanted to see if there was a clear [time value](https://github.com/amandashort/capstone/blob/main/analysis/45_metric.Rmd) that we should be using to define the loops. This means that throughout the project, I was using 3 seconds as the minimum time spent outside of touching distance for a loop to be considered. However, I wanted to see if there was a different value that we should be using based on the data. I find that there does not appear to be a clear "turning point" that would indicate such a value. 
 
+The final part of this project was to build in the capability to look at loops during certain portions of the day. This can be done with specific times, or could be specified as "morning", "afternoon", etc. as seen [here](https://github.com/amandashort/capstone/blob/main/analysis/46_time.Rmd).
+Finally, I needed to remove all of the extra departures that did not have corresponding arrivals, which I did by pulling the first departure value following an arrival and discarding the rest. I also plot the frequency of arrivals and departures by individual or group.
+
 
 
 
