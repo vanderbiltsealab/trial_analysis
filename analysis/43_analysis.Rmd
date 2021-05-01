@@ -40,19 +40,6 @@ mn <- mn %>% filter(!is.na(device))
 ```
 
 
-**thinking through loop initiation and closing (arrivals and departures) 
-Note: this is using loops as an indicator of arrival
-
-
-```{r}
-# mn %>% filter(loop == 1) %>% mutate(
-#     touching = case_when(
-#       (distance_06 < 1 & distance_07 < 1) ~ "both",
-#       distance_07 < 1 ~ "07",
-#       distance_06 < 1 ~ "06"
-#     ))
-```
-
 
 
 
