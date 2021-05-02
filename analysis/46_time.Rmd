@@ -63,28 +63,30 @@ final_dataframe
 ```{r}
 final_data_arr <- final_dataframe %>% filter(arrival != "none") %>% filter(arrival != "start")
 ggplot(final_data_arr, aes(arrival)) +
-  geom_bar(fill = "darkslategray4") +
+  geom_bar(fill = "darkolivegreen") +
   xlab("Arrival") +
   ylab("Count") +
   theme_light() +
-  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), text = element_text(size=20)) +
   scale_x_discrete(labels=c("child" = "Child", "father" = "Father",
                               "mother" = "Mother", "multiple_child" = "Multiple (Child)", "multiple_parents" = "Multiple (No Child)"))
-
+ggsave('arrivals.png', width=10, height=8, dpi=300)
 ```
 
 ```{r}
 final_data_dep <- final_dataframe %>% filter(departure != "none")
 ggplot(final_data_dep, aes(departure)) +
-  geom_bar(fill = "darkslategray4") +
+  geom_bar(fill = "darkolivegreen") +
   xlab("Departure") +
   ylab("Count") +
   theme_light() +
-  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), text = element_text(size=20)) +
   scale_x_discrete(labels=c("child" = "Child", "father" = "Father",
                               "mother" = "Mother", "multiple_child" = "Multiple (Child)", "multiple_parents" = "Multiple (No Child)"))
+ggsave("departures.png", width=10, height=8, dpi=300)
 
 ```
+
 
 
 
