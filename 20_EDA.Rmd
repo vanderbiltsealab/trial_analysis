@@ -3,16 +3,15 @@ title: "20_EDA"
 output: html_notebook
 ---
 
+This notebook is for visualizing the data. Specifically, I plot the distance of each of the parents from the child throughout the day. This notebook contains normal as well as animated plots that take into account this distance but not the motion of any individual.
+
+
 ```{r}
 hist(df$distance)
 hist(log(df$distance))
 
 ```
 
-
-```{r}
-#df$hour <- format(strptime(df$datetime,"%H:%M:%S"),'%H:%M')
-```
 
 ```{r}
 #remove child device as main device and filter to other device = the child device. This allows for isolation of the parent distance
@@ -22,7 +21,7 @@ df1 <- df %>% filter(device != 'c0:98:e5:42:01:03') %>% filter(other_device == '
 
 
 ```{r}
-#with legend for same graph
+#plot distance of parents from child
 pp <- ggplot(df1, aes(datetime, distance_m, size = .9, colour = device)) +
   geom_point(alpha = 0.7, show.legend = TRUE) +
   geom_hline(yintercept = 1, color = 'red') +
@@ -39,7 +38,7 @@ plot(pp)
 
 
 ```{r}
-#Both points overlayed into the same plot
+#Both points overlayed into the same plot - animation
 pq1 <- pp +
   transition_reveal(datetime)+
   theme(panel.grid.minor = element_blank(), panel.grid.major = element_blank()) +
@@ -70,7 +69,7 @@ plot(pp)
 
 
 ```{r}
-#Points in separate graphs
+#Points in separate graphs - animated
 pq <- pp +
   facet_wrap(~device) +
   transition_reveal(datetime) 
@@ -84,12 +83,16 @@ animate(pq, duration = 25)
 
 
 ```{r}
-##to save file -- 
-#b <- animate(pq1, renderer = ffmpeg_renderer())
-
-#anim_save("animation.mp4", b)
-
-#a <- animate(pq, renderer = av_renderer("animation.mp4"), duration = 25, width = 800, height = 450)
-#anim_save("animation1.mp4", a)
+# ##to save file -- 
+#  b <- animate(pq1, renderer = ffmpeg_renderer())
+# # 
+# anim_save("animation_.mp4", b)
+# # 
+# a <- animate(pq1, renderer = av_renderer("animation_.mp4"), duration = 25, width = 800, height = 450)
+# 
+# anim_save("animation2.mp4", a)
 ```
+
+
+
 
