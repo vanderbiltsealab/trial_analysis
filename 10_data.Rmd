@@ -1,7 +1,12 @@
 ---
-title: "R Notebook"
+title: "10_data"
 output: html_notebook
 ---
+
+
+
+The purpose of this notebook is to read in the data from each of the log files as well as the motion data generated from the tottag-motion.ipynb file. Finally, I bind all of the data together, by row, into one large dataframe. I also pull out interactions by pair to be used at a later point. 
+
 ```{r}
 #Add libraries
 library(tidyverse)
@@ -29,7 +34,7 @@ colnames(file_03)[3]<-"distance"
 ```
 
 ```{r}
-#load in motion data
+#load in motion data - this is obtained from running the ipynb 
 motion_03 <- read_csv("data/03_motions.csv") %>% clean_names()
 ```
 
@@ -39,6 +44,7 @@ df_03 <- merge(file_03,motion_03,by="timestamp", all=T)
 ```
 
 ```{r}
+#fill all missing motion values since only state changes are recorded
 df_03 <- df_03 %>% fill(motion)  %>% fill(device, .direction = 'updown')
 df_03 <- df_03[!is.na(df_03$distance), ]
 df_03 <- df_03 %>% 
@@ -132,16 +138,19 @@ df$time <- format(df$datetime,"%H:%M:%S")
 Individual Interactions:
 
 ```{r}
-z_s <- df %>% filter(device == 'c0:98:e5:42:01:06') %>% filter(other_device == 'c0:98:e5:42:01:03')
+#father with child
+f_c <- df %>% filter(device == 'c0:98:e5:42:01:06') %>% filter(other_device == 'c0:98:e5:42:01:03')
 ```
 
 ```{r}
-v_s <- df %>% filter(device == 'c0:98:e5:42:01:07') %>% filter(other_device == 'c0:98:e5:42:01:03')
+#mother with child
+m_c <- df %>% filter(device == 'c0:98:e5:42:01:07') %>% filter(other_device == 'c0:98:e5:42:01:03')
 ```
 
 ```{r}
-s_z <- df %>% filter(device == 'c0:98:e5:42:01:03') %>% filter(other_device == 'c0:98:e5:42:01:06')
-s_v <- df %>% filter(device == 'c0:98:e5:42:01:03') %>% filter(other_device == 'c0:98:e5:42:01:07')
+#child with father and child with mother
+c_f <- df %>% filter(device == 'c0:98:e5:42:01:03') %>% filter(other_device == 'c0:98:e5:42:01:06')
+c_m <- df %>% filter(device == 'c0:98:e5:42:01:03') %>% filter(other_device == 'c0:98:e5:42:01:07')
 ```
 
 
