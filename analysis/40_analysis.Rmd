@@ -10,15 +10,18 @@ Child with Mother
 --------------------
 
 ```{r}
-merged <- merge(s_v, v_s, by = 'timestamp')
+#merge the files that contain child-mother interaction and mother-child interaction
+merged <- merge(c_m, m_c, by = 'timestamp')
 merged <- merged %>% filter(distance.x == distance.y)
 ```
 
 ```{r}
+#filter where the child is in motion and the mother is not
 motion0307 <- merged %>% filter(motion.x == 1 & motion.y == 0)
 ```
 
 ```{r}
+#plot this data
 t <- ggplot(motion0307, aes(x=timestamp, y=distance_m.x)) +
   geom_line(alpha = .7) + 
   xlab("") +
@@ -41,7 +44,7 @@ for(i in 1:nrow(merged)) {
 #count 3 seconds outside of touching distance
 merged$sum <- rollapply(merged$yn,3,sum, partial = TRUE, align = "right")
 
-#determine loop
+#determine loop - going from outside of touching distance to within
 for(i in 1:nrow(merged)) {
   if ((merged$sum[i] == 2) && (merged$sum[i-1] == 3)) {
     merged[i,'loop'] <- 1
@@ -122,7 +125,7 @@ Child with Father
 --------------------
 
 ```{r}
-merged1 <- merge(s_z, z_s, by = 'timestamp')
+merged1 <- merge(c_f, f_c, by = 'timestamp')
 merged1 <- merged1 %>% filter(distance.x == distance.y)
 ```
 
