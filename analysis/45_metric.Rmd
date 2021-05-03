@@ -1,11 +1,12 @@
 ---
-title: "R Notebook"
+title: "45_metric"
 output: html_notebook
 ---
 
-Metric creation
+Metric creation - This notebook seeks to find if there is a clear amount of time that should be used for outside of touching distance in a loop. This does not need to be run in the future but was rather just a one-time test
 
 ```{r}
+#put loop creation into a function
 metric <- function(seconds) {
   mn$sum <- rollapply(mn$yn,seconds,sum, partial = TRUE, align = "right")
   for(i in 1:nrow(mn)) {
@@ -28,6 +29,7 @@ for(i in 1:nrow(mn)) {
 ```
 
 ```{r}
+#how many loops are made as the number of seconds increases from 3 to 10?
 loop_count <- c()
 second <- seq(3, 10, by=1)
 for(f in second){
@@ -38,6 +40,7 @@ loop_count
 
 
 ```{r}
+#plot this relationship
 ggplot() +
   geom_point(aes(x = second, y = loop_count)) +
   xlab('Seconds') + ylab('Loops') +

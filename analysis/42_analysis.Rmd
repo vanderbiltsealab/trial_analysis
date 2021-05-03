@@ -11,7 +11,7 @@ Father with Child
 --------------------
 
 ```{r}
-merged3 <- merge(s_z, z_s, by = 'timestamp') 
+merged3 <- merge(c_f, f_c, by = 'timestamp') 
 merged3 <- merged3 %>% filter(distance.x == distance.y)
 ```
 
@@ -75,9 +75,11 @@ merged3$touching <- ifelse(merged3$distance_m.y <= 1, 1, 0)
 
 ```{r}
 ggplot(merged3, aes(touching, y = ..prop..)) +
-  geom_bar(width = .5) +
+  geom_bar(width = .5, fill = "darkolivegreen") +
+  xlab("Touching") +
+  ylab("Percent of time") +
   theme_light() +
-  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), text = element_text(size=20)) +
   scale_y_continuous(labels = scales::percent_format())
 ```
 

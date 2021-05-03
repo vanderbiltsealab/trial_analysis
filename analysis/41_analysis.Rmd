@@ -11,7 +11,7 @@ Mother with Child
 --------------------
 
 ```{r}
-merged2 <- merge(s_v, v_s, by = 'timestamp')
+merged2 <- merge(c_m, m_c, by = 'timestamp')
 merged2 <- merged2 %>% filter(distance.x == distance.y)
 ```
 
@@ -77,13 +77,16 @@ merged2$touching <- ifelse(merged2$distance_m.y <= 1, 1, 0)
 
 ```{r}
 ggplot(merged2, aes(touching, y = ..prop..)) +
-  geom_bar(width = .5) +
+  geom_bar(width = .5, fill = "darkolivegreen") +
+  xlab("Touching") +
+  ylab("Percent of time") +
   theme_light() +
-  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), text = element_text(size=20)) +
   scale_y_continuous(labels = scales::percent_format())
 ```
 
 ```{r}
+#Look at proportions - in touching distance 68% of the time
 prop.table(table(merged2$touching)) %>% round(2)
 ```
 

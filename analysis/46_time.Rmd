@@ -3,6 +3,9 @@ title: "46-time-of-day"
 output: html_notebook
 ---
 
+This notebook accomplishes two different tasks: the first is to provide a framework for splitting up the day into different portions so that we can look at how many loops are made at certain times. This is demonstrated with morning but can be changed accordingly.
+I also create the final dataframe for the loops including the arrival and departure, duration, time, etc. 
+
 
 ```{r}
 #morning
@@ -21,6 +24,7 @@ _________________________________
 
 
 ```{r}
+##This filters out all of the extra departures that do not belong to a specific loop
 mn3 <- mn_new %>% filter((arrival != "") | (departure != ""))
 
 
@@ -51,6 +55,7 @@ mn_d$time <- as.POSIXct(mn_d$time, format = "%H:%M:%S")
 
 
 ```{r}
+#create dataframe of loops
 final_dataframe <- data.frame("start_time" = mn_a$time,
                               "end_time" = mn_d$time,
                               "arrival" = mn_a$arrival,
@@ -61,6 +66,7 @@ final_dataframe
 
 
 ```{r}
+#plot arrivals
 final_data_arr <- final_dataframe %>% filter(arrival != "none") %>% filter(arrival != "start")
 ggplot(final_data_arr, aes(arrival)) +
   geom_bar(fill = "darkolivegreen") +
@@ -74,6 +80,7 @@ ggsave('arrivals.png', width=10, height=8, dpi=300)
 ```
 
 ```{r}
+#plot departures
 final_data_dep <- final_dataframe %>% filter(departure != "none")
 ggplot(final_data_dep, aes(departure)) +
   geom_bar(fill = "darkolivegreen") +

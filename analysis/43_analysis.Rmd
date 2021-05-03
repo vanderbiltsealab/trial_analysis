@@ -11,7 +11,8 @@ All family members loops with child
 
 
 ```{r}
-m <- merge(s_z, z_s, by = "timestamp", all = TRUE)
+#father and child
+m <- merge(c_f, f_c, by = "timestamp", all = TRUE)
 #m <- inner_join(s_z, z_s, by = 'timestamp')
 m <- m %>% filter(distance.x == distance.y)
 m <- m %>% select(timestamp, device.x, device.y, motion.x, motion.y, other_device.x, other_device.y, distance_m.x, time.x)
@@ -22,7 +23,8 @@ m <- reshape(m, idvar = "timestamp", timevar = "device.y", direction = "wide")
 
 
 ```{r}
-n <- merge(s_v, v_s, by = "timestamp", all = TRUE)
+#mother and child
+n <- merge(c_m, m_c, by = "timestamp", all = TRUE)
 #n <- inner_join(s_v, v_s, by = 'timestamp')
 n <- n %>% filter(distance.x == distance.y)
 n <- n %>% select(timestamp, device.x, device.y, motion.x, motion.y, other_device.x, other_device.y, distance_m.x, time.x)
@@ -31,6 +33,7 @@ n <- reshape(n, idvar = "timestamp", timevar = "device.y", direction = "wide")
 ```
 
 ```{r}
+#dataframe with all individuals
 mn <- merge(m, n, by = "timestamp", all = TRUE) %>%
 #mn <-inner_join(m,n, by = 'timestamp') %>% 
   select(-c('timestamp', starts_with('other_device'), 'time.c0:98:e5:42:01:07', 'device.x.c0:98:e5:42:01:07', 'motion.x.c0:98:e5:42:01:07'))
