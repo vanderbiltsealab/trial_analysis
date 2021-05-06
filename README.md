@@ -1,4 +1,4 @@
-# Capstone
+# Analysis of Trial Data
 
 My primary goal with this project is to determine "loops" between parents and children. It is well-known that there is a "circle of security" that children have which is when they are near to a parent. Here, we consider that circle to be when a child is within touching distance of a parent (roughly 1 meter). I find these loops within the data and attempt to analyze who "departs" or walks out of touching distance, and who "arrives" or comes back within touching distance. The ultimate goal is to see how these trends change as a child gets older and who is driving most of the interaction in either direction.
 
